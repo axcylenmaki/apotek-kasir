@@ -66,6 +66,7 @@ $result = $conn->query("SELECT * FROM member ORDER BY id DESC");
                     <th class="px-6 py-4 text-left font-medium">Nama</th>
                     <th class="px-6 py-4 text-left font-medium">Kontak</th>
                     <th class="px-6 py-4 text-left font-medium">Point</th>
+                    <th class="px-6 py-4 text-left font-medium">Status</th> <!-- Tambah kolom status -->
                     <th class="px-6 py-4 text-center font-medium">Aksi</th>
                 </tr>
             </thead>
@@ -76,6 +77,13 @@ $result = $conn->query("SELECT * FROM member ORDER BY id DESC");
                     <td class="px-6 py-3 font-semibold"><?= htmlspecialchars($row['nama']) ?></td>
                     <td class="px-6 py-3 text-sm text-blue-300"><?= htmlspecialchars($row['no_hp']) ?></td>
                     <td class="px-6 py-3 text-sm"><?= htmlspecialchars($row['poin']) ?></td>
+                    <td class="px-6 py-3 text-sm">
+                        <?php
+                        // Ambil status member dari status.php
+                        include_once '../includes/member/status.php';
+                        echo getStatusMember($row);
+                        ?>
+                    </td>
                     <td class="px-6 py-3 text-center flex justify-center gap-3">
                         <a href="../includes/member/edit.php?id=<?= $row['id'] ?>"
                            class="group p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 shadow-md transition"
@@ -100,7 +108,7 @@ $result = $conn->query("SELECT * FROM member ORDER BY id DESC");
                 <?php endwhile; ?>
                 <?php if ($result->num_rows === 0): ?>
                     <tr>
-                        <td colspan="5" class="px-6 py-6 text-center text-gray-400 italic">Belum ada data member.</td>
+                        <td colspan="6" class="px-6 py-6 text-center text-gray-400 italic">Belum ada data member.</td>
                     </tr>
                 <?php endif; ?>
             </tbody>

@@ -1,5 +1,7 @@
 {
     "require": {
-        "picqer/php-barcode-generator": "^3.2"
+        "picqer/php-barcode-generator": "^3.2",
+        "dompdf/dompdf": "^3.1",
+        "mpdf/mpdf": "^8.2"
     }
 }

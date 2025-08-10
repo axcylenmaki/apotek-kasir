@@ -25,8 +25,6 @@ $role = $_SESSION['role'] ?? '';
             <a href="/apotek-kasir/superadmin/member.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Member</a>
         <?php elseif ($role === 'kasir'): ?>
             <a href="/apotek-kasir/kasir/transaksi.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Transaksi Scan QR</a>
-            <a href="/apotek-kasir/kasir/keranjang.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Keranjang</a>
-            <a href="/apotek-kasir/kasir/invoice.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Invoice WA/PDF</a>
             <a href="/apotek-kasir/kasir/laporan.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Laporan</a>
             <a href="/apotek-kasir/kasir/member.php" class="block px-3 py-2 rounded-lg hover:bg-gray-700 transition">Member</a>
         <?php endif; ?>
