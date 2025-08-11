@@ -4,13 +4,26 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'superadmin') {
     header("Location: ../auth/login.php");
     exit;
 }
+
 include '../config/config.php';
 include '../includes/header.php';
 include '../includes/navbar.php';
 
-$start = $_GET['start'] ?? date('Y-m-01');
-$end = $_GET['end'] ?? date('Y-m-d');
+// Default tanggal - perbaikan dari Y-m-01 ke hari ini
+$today = date('Y-m-d');
+$start = $_GET['start'] ?? $today; // Ubah dari date('Y-m-01')
+$end = $_GET['end'] ?? $today;
 $range = $_GET['range'] ?? 'harian';
+
+// Validasi range harian
+if ($range === 'harian') {
+    $end = $start;
+}
+
+// Pastikan end tidak lebih kecil dari start
+if (strtotime($end) < strtotime($start)) {
+    $end = $start;
+}
 
 // Ambil semua produk
 $produk = $conn->query("SELECT * FROM produk");
@@ -40,29 +53,27 @@ switch ($range) {
     case 'mingguan':
         $select = "YEAR(tanggal) as thn, WEEK(tanggal,1) as grp";
         $group = "YEAR(tanggal), WEEK(tanggal,1)";
-        $labelFormat = "'Minggu ' . \$row['grp'] . ' ' . \$row['thn']";
         break;
     case 'bulanan':
         $select = "YEAR(tanggal) as thn, MONTH(tanggal) as grp";
         $group = "YEAR(tanggal), MONTH(tanggal)";
-        $labelFormat = "date('M Y', strtotime(\$row['thn'].'-'.\$row['grp'].'-01'))";
         break;
     case 'tahunan':
         $select = "YEAR(tanggal) as grp";
         $group = "YEAR(tanggal)";
-        $labelFormat = "\$row['grp']";
         break;
     default: // harian
         $select = "DATE(tanggal) as grp";
         $group = "DATE(tanggal)";
-        $labelFormat = "date('d M', strtotime(\$row['grp']))";
         break;
 }
 
+// Query untuk grafik dengan filter yang benar
 $result = $conn->query("
     SELECT $select, 
            COUNT(DISTINCT t.id) as transaksi,
-           SUM(k.qty * p.harga_beli) as modal
+           SUM(k.qty * p.harga_beli) as modal,
+           SUM(t.total) as total_penjualan
     FROM transaksi t
     JOIN keranjang k ON t.id = k.id_transaksi
     JOIN produk p ON k.id_produk = p.id
@@ -70,6 +81,51 @@ $result = $conn->query("
     GROUP BY $group
     ORDER BY $group
 ");
+
+
+// Query untuk tabel transaksi
+// --- DATA TRANSAKSI TABEL --- //
+// Pindahkan bagian ini SEBELUM query yang menggunakan $tabelGroup
+$tabelGroup = '';
+$tabelSelect = '';
+switch ($range) {
+    case 'mingguan':
+        $tabelGroup = "YEAR(t.tanggal), WEEK(t.tanggal,1)";
+        $tabelSelect = "YEAR(t.tanggal) as thn, WEEK(t.tanggal,1) as minggu";
+        break;
+    case 'bulanan':
+        $tabelGroup = "YEAR(t.tanggal), MONTH(t.tanggal)";
+        $tabelSelect = "YEAR(t.tanggal) as thn, MONTH(t.tanggal) as bln";
+        break;
+    case 'tahunan':
+        $tabelGroup = "YEAR(t.tanggal)";
+        $tabelSelect = "YEAR(t.tanggal) as thn";
+        break;
+    default:
+        $tabelGroup = '';
+        $tabelSelect = '';
+        break;
+}
+
+// Sekarang baru query yang menggunakan $tabelGroup
+if ($tabelGroup) {
+    // Grouped transaksi
+    $transaksi = $conn->query("
+        SELECT $tabelSelect, COUNT(*) as jumlah, SUM(t.total) as total, MAX(t.tanggal) as tanggal_akhir
+        FROM transaksi t
+        WHERE DATE(t.tanggal) BETWEEN '$start' AND '$end'
+        GROUP BY $tabelGroup
+        ORDER BY tanggal_akhir DESC
+    ");
+} else {
+    // Per transaksi
+    $transaksi = $conn->query("SELECT t.*, u.nama as kasir, m.nama as member, t.metode_bayar
+        FROM transaksi t
+        JOIN users u ON t.id_kasir = u.id
+        LEFT JOIN member m ON t.id_member = m.id
+        WHERE DATE(t.tanggal) BETWEEN '$start' AND '$end'
+        ORDER BY t.tanggal DESC");
+}
 
 while ($row = $result->fetch_assoc()) {
     // Label sesuai range
@@ -248,11 +304,14 @@ $totalKeuntungan = $totalPenjualan - $totalModal;
         <a href="../includes/laporan/log_kegiatan.php" class="px-4 py-2 rounded-lg font-semibold <?= basename($_SERVER['PHP_SELF']) == 'laporan_kegiatan_kasir.php' ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-800' ?>">Kegiatan Kasir</a>
     </div>
 
-    <!-- Tombol Download PDF per kategori -->
-    <div class="mb-6 flex flex-wrap gap-2">
-        <a href="../includes/laporan/export_pdf.php?tipe=penjualan&start=2025-08-01&end=2025-08-10" target="_blank" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">Download PDF Penjualan</a>
-
-    </div>
+    <!-- Ganti link export PDF yang statis dengan dinamis -->
+<div class="mb-6 flex flex-wrap gap-2">
+    <a href="../includes/laporan/export_pdf.php?tipe=penjualan&start=<?= $start ?>&end=<?= $end ?>&range=<?= $range ?>" 
+       target="_blank" 
+       class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+        Download PDF Penjualan
+    </a>
+</div>
 
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
         <div class="bg-[#1e293b] text-white p-4 rounded shadow">

@@ -21,14 +21,26 @@ if (!$produk) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Kirim juga user_id untuk updated_by
-    if (editProduk($id, $_POST, $_FILES)) {
-        echo "<script>alert('Produk berhasil diperbarui'); window.location.href='../../superadmin/produk.php';</script>";
-        exit;
+    $nama_produk = trim($_POST['nama_produk']);
+
+    // Cek duplikat nama produk, kecuali id produk yang sedang diedit
+    $cekStmt = $conn->prepare("SELECT id FROM produk WHERE nama_produk = ? AND id != ?");
+    $cekStmt->bind_param("si", $nama_produk, $id);
+    $cekStmt->execute();
+    $cekResult = $cekStmt->get_result();
+
+    if ($cekResult->num_rows > 0) {
+        echo "<script>alert('Nama produk sudah digunakan oleh produk lain, silakan gunakan nama lain');</script>";
     } else {
-        echo "<script>alert('Gagal memperbarui produk');</script>";
+        if (editProduk($id, $_POST, $_FILES)) {
+            echo "<script>alert('Produk berhasil diperbarui'); window.location.href='../../superadmin/produk.php';</script>";
+            exit;
+        } else {
+            echo "<script>alert('Gagal memperbarui produk');</script>";
+        }
     }
 }
+
 
 $kategoriList = getAllKategori();
 ?>

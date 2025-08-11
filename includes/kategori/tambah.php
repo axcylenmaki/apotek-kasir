@@ -28,12 +28,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_file);
     }
 
+   // Cek duplikasi nama_kategori
+$cekQuery = $conn->prepare("SELECT id FROM kategori WHERE nama_kategori = ?");
+$cekQuery->bind_param("s", $nama_kategori);
+$cekQuery->execute();
+$cekResult = $cekQuery->get_result();
+
+if ($cekResult->num_rows > 0) {
+    $error = "❌ Nama kategori sudah ada. Silakan gunakan nama lain.";
+} else {
     if (createKategori($conn, $nama_kategori, $keterangan, $gambar, $created_by)) {
         header("Location: ../../superadmin/kategori.php?add=success");
         exit;
     } else {
         $error = "❌ Gagal menambahkan kategori. Silakan coba lagi.";
     }
+}
+
 }
 ?>
 

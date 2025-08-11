@@ -5,8 +5,8 @@ require_once '../header.php';
 require_once '../navbar.php';
 require_once 'functions.php';
 
-if ($_SESSION['role'] !== 'superadmin') {
-    header('Location: ../../login.php');
+if (!in_array($_SESSION['role'], ['superadmin', 'kasir'])) {
+    header('Location: ../../auth/login.php');
     exit;
 }
 
@@ -101,4 +101,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
     </div>
 </body>
+<script>
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const toggleBtn = document.getElementById('sidebarToggle');
+
+    toggleBtn?.addEventListener('click', () => {
+        sidebar?.classList.toggle('-translate-x-full');
+
+        // Optional: shift konten utama (kalau sidebar muncul)
+        if (!sidebar.classList.contains('-translate-x-full')) {
+            mainContent.classList.add('md:ml-64');
+        } else {
+            mainContent.classList.remove('md:ml-64');
+        }
+    });
+</script>
 </html>

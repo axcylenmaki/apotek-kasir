@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($user["role"] == "superadmin") {
                 header("Location: ../superadmin/dashboard.php");
             } else {
-                header("Location: ../kasir/dashboard.php");
+                header("Location: ../kasir/transaksi.php");
             }
             exit;
         } else {

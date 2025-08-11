@@ -20,34 +20,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $gambar = $kategori['gambar']; // gambar default lama
     $updated_by = $_SESSION['user_id'];
 
-    // Jika gambar baru diupload
-    if (!empty($_FILES['gambar']['name'])) {
-        $new_gambar = basename($_FILES['gambar']['name']);
-        $target_dir = "../../assets/img/kategori/";
-        $target_file = $target_dir . $new_gambar;
+    // Cek nama kategori duplikat kecuali yang sedang diedit
+    $cekQuery = $conn->prepare("SELECT id FROM kategori WHERE nama_kategori = ? AND id != ?");
+    $cekQuery->bind_param("si", $nama_kategori, $id);
+    $cekQuery->execute();
+    $cekResult = $cekQuery->get_result();
 
-        // Buat folder jika belum ada
-        if (!file_exists($target_dir)) {
-            mkdir($target_dir, 0777, true);
-        }
+    if ($cekResult->num_rows > 0) {
+        $error = "❌ Nama kategori sudah digunakan oleh kategori lain. Silakan gunakan nama lain.";
+    } else {
+        // Jika gambar baru diupload
+        if (!empty($_FILES['gambar']['name'])) {
+            $new_gambar = basename($_FILES['gambar']['name']);
+            $target_dir = "../../assets/img/kategori/";
+            $target_file = $target_dir . $new_gambar;
 
-        if (move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_file)) {
-            // Hapus gambar lama jika berbeda dan ada
-            if (!empty($gambar) && file_exists($target_dir . $gambar) && $gambar !== $new_gambar) {
-                unlink($target_dir . $gambar);
+            // Buat folder jika belum ada
+            if (!file_exists($target_dir)) {
+                mkdir($target_dir, 0777, true);
             }
 
-            $gambar = $new_gambar;
+            if (move_uploaded_file($_FILES["gambar"]["tmp_name"], $target_file)) {
+                // Hapus gambar lama jika berbeda dan ada
+                if (!empty($gambar) && file_exists($target_dir . $gambar) && $gambar !== $new_gambar) {
+                    unlink($target_dir . $gambar);
+                }
+
+                $gambar = $new_gambar;
+            }
+        }
+
+        if (updateKategori($conn, $id, $nama_kategori, $keterangan, $gambar, 0, $updated_by)) {
+            header("Location: ../../superadmin/kategori.php?edit=success");
+            exit;
+        } else {
+            $error = "❌ Gagal mengupdate data.";
         }
     }
-
-    if (updateKategori($conn, $id, $nama_kategori, $keterangan, $gambar, 0, $updated_by)) {
-        header("Location: ../../superadmin/kategori.php?edit=success");
-        exit;
-    } else {
-        $error = "❌ Gagal mengupdate data.";
-    }
 }
+
 ?>
 
 <!DOCTYPE html>

@@ -3,10 +3,11 @@ session_start();
 include 'config/config.php'; // Sesuaikan path-nya jika beda
 
 // Cek login
-if (!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || !in_array($_SESSION['role'], ['superadmin', 'kasir'])) {
     header("Location: /apotek-kasir/auth/login.php");
-    exit();
+    exit;
 }
+
 
 $user_id = $_SESSION['user_id'];
 
@@ -66,9 +67,9 @@ $user = $result->fetch_assoc();
             </div>
 
             <div class="mt-6">
-                <a href="/apotek-kasir/edit_profile.php" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                    Edit Profile
-                </a>
+<a href="/apotek-kasir/includes/kasir/edit.php?id=<?= $user['id'] ?>" class="inline-block bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+    Edit Profile
+</a>
             </div>
         </div>
     </div>

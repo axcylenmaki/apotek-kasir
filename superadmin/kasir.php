@@ -61,6 +61,7 @@ $kasirList = getAllKasir();
                         <th class="px-6 py-4 text-left font-medium">Email</th>
                         <th class="px-6 py-4 text-left font-medium">Foto</th> <!-- Tambahkan ini -->
                         <th class="px-6 py-4 text-left font-medium">Role</th>
+                        <th class="px-6 py-4 text-left font-medium">Status</th>
                         <th class="px-6 py-4 text-center font-medium">Aksi</th>
                     </tr>
                 </thead>
@@ -86,6 +87,13 @@ $kasirList = getAllKasir();
                                     <?= htmlspecialchars($kasir['role']) ?>
                                 </span>
                             </td>
+                            <td class="px-6 py-3">
+    <span class="inline-block px-3 py-1 rounded-full text-xs font-semibold 
+        <?= $kasir['aktif'] ? 'bg-green-600 text-green-100' : 'bg-red-600 text-red-100' ?>">
+        <?= $kasir['aktif'] ? 'Aktif' : 'Tidak Aktif' ?>
+    </span>
+</td>
+
                             <td class="px-6 py-3 text-center flex justify-center gap-3">
                                 <a href="../includes/kasir/edit.php?id=<?= $kasir['id'] ?>"
                                    class="group p-2 rounded-md bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 shadow-md transition"
@@ -97,22 +105,23 @@ $kasirList = getAllKasir();
                                     </svg>
                                 </a>
 
-                                <?php if ($kasir['role'] !== 'superadmin'): ?>
-                                    <a href="../includes/kasir/hapus.php?id=<?= $kasir['id'] ?>"
-                                       onclick="return confirm('Yakin ingin menghapus kasir ini?')"
-                                       class="group p-2 rounded-md bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-md transition"
-                                       title="Hapus Kasir">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white group-hover:text-gray-100 transition"
-                                             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                            <path stroke-linecap="round" stroke-linejoin="round"
-                                                  d="M19 7L5 21M5 7l14 14"/>
-                                        </svg>
-                                    </a>
-                                <?php else: ?>
-                                    <span class="text-gray-400 italic text-sm select-none" title="Tidak bisa dihapus">
-                                        Tidak bisa dihapus
-                                    </span>
-                                <?php endif; ?>
+                              <?php if ($kasir['role'] !== 'superadmin' && !$kasir['aktif']): ?>
+    <a href="../includes/kasir/hapus.php?id=<?= $kasir['id'] ?>"
+       onclick="return confirm('Yakin ingin menghapus kasir ini?')"
+       class="group p-2 rounded-md bg-red-600 hover:bg-red-700 active:bg-red-800 shadow-md transition"
+       title="Hapus Kasir">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white group-hover:text-gray-100 transition"
+             fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M19 7L5 21M5 7l14 14"/>
+        </svg>
+    </a>
+<?php else: ?>
+    <span class="text-gray-400 italic text-sm select-none" title="Tidak bisa dihapus">
+        Tidak bisa dihapus
+    </span>
+<?php endif; ?>
+
                             </td>
                         </tr>
                     <?php endforeach; ?>

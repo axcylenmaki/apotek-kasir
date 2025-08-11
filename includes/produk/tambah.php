@@ -14,13 +14,26 @@ require_once 'functions.php';
 
 // Proses jika form disubmit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (tambahProduk($_POST, $_FILES)) {
-        echo "<script>alert('Produk berhasil ditambahkan'); window.location.href='../../superadmin/produk.php';</script>";
-        exit;
+    $nama_produk = trim($_POST['nama_produk']);
+
+    // Cek duplikat nama produk
+    $cekStmt = $conn->prepare("SELECT id FROM produk WHERE nama_produk = ?");
+    $cekStmt->bind_param("s", $nama_produk);
+    $cekStmt->execute();
+    $cekResult = $cekStmt->get_result();
+
+    if ($cekResult->num_rows > 0) {
+        echo "<script>alert('Nama produk sudah ada, silakan gunakan nama lain');</script>";
     } else {
-        echo "<script>alert('Gagal menambahkan produk');</script>";
+        if (tambahProduk($_POST, $_FILES)) {
+            echo "<script>alert('Produk berhasil ditambahkan'); window.location.href='../../superadmin/produk.php';</script>";
+            exit;
+        } else {
+            echo "<script>alert('Gagal menambahkan produk');</script>";
+        }
     }
 }
+
 
 // Ambil kategori untuk dropdown
 $kategoriList = getAllKategori();
