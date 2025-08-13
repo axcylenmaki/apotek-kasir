@@ -27,10 +27,25 @@ function updateKategori($conn, $id, $nama_kategori, $keterangan, $gambar = null,
 }
 
 function deleteKategori($conn, $id) {
+    // Cek apakah kategori sedang digunakan oleh produk
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM produk WHERE id_kategori = ?");
+    $stmt->bind_param("i", $id);
+    $stmt->execute();
+    $stmt->bind_result($jumlah);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($jumlah > 0) {
+        // Tidak boleh hapus, karena masih dipakai
+        throw new Exception("Kategori tidak dapat dihapus karena masih digunakan oleh $jumlah produk.");
+    }
+
+    // Lanjut hapus kategori
     $stmt = $conn->prepare("DELETE FROM kategori WHERE id = ?");
     $stmt->bind_param("i", $id);
     return $stmt->execute();
 }
+
 
 function updateJumlahProdukPerKategori($conn) {
     $kategoriResult = $conn->query("SELECT id FROM kategori");

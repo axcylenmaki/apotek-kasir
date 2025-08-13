@@ -298,11 +298,11 @@ $totalKeuntungan = $totalPenjualan - $totalModal;
         </div>
     </div>
 
-    <!-- Tabs Navigasi Laporan -->
+    <!-- Tabs Navigasi Laporan
     <div class="mb-8 flex flex-wrap gap-2">
         <a href="laporan.php" class="px-4 py-2 rounded-lg font-semibold <?= basename($_SERVER['PHP_SELF']) == 'laporan.php' ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-800' ?>">Penjualan</a>
         <a href="../includes/laporan/log_kegiatan.php" class="px-4 py-2 rounded-lg font-semibold <?= basename($_SERVER['PHP_SELF']) == 'laporan_kegiatan_kasir.php' ? 'bg-blue-700 text-white' : 'bg-gray-200 text-gray-800' ?>">Kegiatan Kasir</a>
-    </div>
+    </div> -->
 
     <!-- Ganti link export PDF yang statis dengan dinamis -->
 <div class="mb-6 flex flex-wrap gap-2">

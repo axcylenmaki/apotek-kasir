@@ -16,8 +16,24 @@ if ($id <= 0) {
     exit;
 }
 
-// Ambil data produk untuk hapus gambar jika ada
-$produk = mysqli_fetch_assoc(mysqli_query($conn, "SELECT gambar FROM produk WHERE id = $id"));
+// Cek stok produk
+$stmt = $conn->prepare("SELECT stok, gambar FROM produk WHERE id = ?");
+$stmt->bind_param("i", $id);
+$stmt->execute();
+$result = $stmt->get_result();
+$produk = $result->fetch_assoc();
+$stmt->close();
+
+if (!$produk) {
+    echo "<script>alert('Produk tidak ditemukan.'); window.location.href='../../superadmin/produk.php';</script>";
+    exit;
+}
+
+// Jika stok masih > 0, jangan hapus
+if ($produk['stok'] > 0) {
+    echo "<script>alert('Produk masih memiliki stok, tidak dapat dihapus.'); window.location.href='../../superadmin/produk.php';</script>";
+    exit;
+}
 
 // Proses penghapusan
 if (hapusProduk($id)) {

@@ -23,6 +23,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$username) $errors[] = 'Username wajib diisi.';
     if (!$password) $errors[] = 'Password wajib diisi.';
 
+    // Cek username sudah dipakai atau belum
+    if ($username) {
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($countUsername);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($countUsername > 0) {
+            $errors[] = 'Username sudah digunakan, silakan pilih username lain.';
+        }
+    }
+
+    // Cek email sudah dipakai atau belum (kalau email diisi)
+    if ($email) {
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $stmt->bind_result($countEmail);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($countEmail > 0) {
+            $errors[] = 'Email sudah digunakan, silakan gunakan email lain.';
+        }
+    }
+
     // Validasi file gambar jika diupload
     if (!empty($_FILES['foto']['name'])) {
         $allowedExt = ['jpg', 'jpeg', 'png'];

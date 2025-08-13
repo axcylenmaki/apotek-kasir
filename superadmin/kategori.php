@@ -29,6 +29,20 @@ $kategori = getAllKategori($conn);
             <h1 class="text-3xl font-bold tracking-tight">📦 Manajemen Kategori Produk</h1>
             <p class="text-gray-300 mt-1">Kelola kategori produk toko Anda dengan mudah dan cepat.</p>
         </div>
+        <?php if (isset($_GET['error'])): ?>
+    <div id="alertBox" class="bg-red-500 text-white px-4 py-3 rounded-md mb-4 shadow animate-fade-in relative">
+        <strong class="font-bold">Gagal!</strong>
+        <span class="block sm:inline"><?= htmlspecialchars($_GET['error']) ?></span>
+        <button onclick="document.getElementById('alertBox').remove();" class="absolute top-1 right-3 text-xl">&times;</button>
+    </div>
+<?php elseif (isset($_GET['delete']) && $_GET['delete'] === 'success'): ?>
+    <div id="alertBox" class="bg-green-500 text-white px-4 py-3 rounded-md mb-4 shadow animate-fade-in relative">
+        <strong class="font-bold">Sukses!</strong>
+        <span class="block sm:inline">Kategori berhasil dihapus.</span>
+        <button onclick="document.getElementById('alertBox').remove();" class="absolute top-1 right-3 text-xl">&times;</button>
+    </div>
+<?php endif; ?>
+
 
         <div class="mb-6">
             <a href="../includes/kategori/tambah.php" class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-lg shadow transition duration-200">

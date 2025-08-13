@@ -23,11 +23,14 @@ $produkResult = $conn->query("
         produk.harga_jual,
         produk.gambar,
         produk.barcode,
+        produk.expired_date,
         kategori.nama_kategori AS kategori
     FROM produk
     LEFT JOIN kategori ON produk.id_kategori = kategori.id
+    WHERE produk.expired_date IS NULL OR produk.expired_date >= CURDATE()
     ORDER BY produk.nama_produk ASC
 ");
+
 
 $produkArray = [];
 while ($row = $produkResult->fetch_assoc()) {
@@ -129,6 +132,10 @@ while ($row = $produkResult->fetch_assoc()) {
             <div class="mt-6 pt-4 border-t border-gray-600">
                 <p class="text-lg">Total:</p>
                 <p id="cartTotal" class="text-3xl font-bold text-green-400">Rp 0</p>
+                <p id="cartCountdown" class="text-yellow-400 text-sm font-medium mb-2 hidden">
+    Cart akan direset dalam <span id="countdownTimer">05:00</span>
+</p>
+
                 <button id="clearCartBtn"
         class="mt-3 w-full bg-gray-700 hover:bg-gray-600 text-white py-2 rounded transition">
     Clear Cart
@@ -187,13 +194,24 @@ let memberPoin = 0;
 let pakaiPoin = false;
 
 function addToCart(produk) {
+    const expiredDate = new Date(produk.expired_date);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // reset jam agar akurat per hari
+
+    if (produk.expired_date && expiredDate < today) {
+        alert(`❌ Produk "${produk.nama_produk}" sudah kadaluarsa dan tidak bisa ditambahkan.`);
+        return;
+    }
+
     if (cart[produk.id]) {
         cart[produk.id].qty += 1;
     } else {
         cart[produk.id] = { ...produk, qty: 1 };
     }
     renderCart();
+    startCartCountdown(); // aktifkan countdown
 }
+
 
 function updateDiskon() {
     const diskonInput = document.getElementById("diskonInput");
@@ -302,7 +320,9 @@ function updateQty(id, change) {
         if (cart[id].qty <= 0) delete cart[id];
     }
     renderCart();
+    startCartCountdown(); // ✅ juga aktifkan countdown saat update qty
 }
+
 
 // Format rupiah
 function formatRupiah(num) {
@@ -441,6 +461,70 @@ document.getElementById("memberPhone").addEventListener("input", () => {
     updateDiskon();
     renderCart();
 });
+document.getElementById("clearCartBtn").addEventListener("click", () => {
+    if (confirm("Yakin ingin menghapus semua item dari keranjang?")) {
+        cart = {};
+        renderCart();
+        clearTimeout(cartTimer);
+        clearInterval(countdownInterval);
+        document.getElementById("cartCountdown").classList.add("hidden");
+    }
+});
+
+
+// Panggil resetCartTimer() setiap kali cart diubah
+
+
+
+
+let cartTimer = null;
+let countdownInterval = null;
+let countdownSeconds = 300; // 5 menit = 300 detik
+
+function formatCountdown(secs) {
+    const m = String(Math.floor(secs / 60)).padStart(2, '0');
+    const s = String(secs % 60).padStart(2, '0');
+    return `${m}:${s}`;
+}
+
+function startCartCountdown() {
+    const countdownDisplay = document.getElementById('cartCountdown');
+    const timerText = document.getElementById('countdownTimer');
+    
+    if (!cart || Object.keys(cart).length === 0) {
+        countdownDisplay.classList.add("hidden");
+        clearTimeout(cartTimer);
+        clearInterval(countdownInterval);
+        return;
+    }
+
+    countdownSeconds = 300;
+    countdownDisplay.classList.remove("hidden");
+    timerText.textContent = formatCountdown(countdownSeconds);
+
+    // Hapus existing timers
+    clearTimeout(cartTimer);
+    clearInterval(countdownInterval);
+
+    // Countdown display tiap detik
+    countdownInterval = setInterval(() => {
+        countdownSeconds--;
+        timerText.textContent = formatCountdown(countdownSeconds);
+        if (countdownSeconds <= 0) {
+            clearInterval(countdownInterval);
+        }
+    }, 1000);
+
+    // Reset cart setelah 5 menit
+    cartTimer = setTimeout(() => {
+        alert("Cart telah dikosongkan karena tidak ada aktivitas selama 5 menit.");
+        cart = {};
+        renderCart();
+        countdownDisplay.classList.add("hidden");
+    }, 5 * 60 * 1000);
+}
+
+
 </script>
 
 <!-- Sidebar Toggle (Dipertahankan) -->

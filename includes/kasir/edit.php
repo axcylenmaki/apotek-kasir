@@ -25,32 +25,72 @@ if (!$kasir) {
 
 // Tangani submit
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'];
-    $email = $_POST['email'] ?? null;
+    $username = trim($_POST['username']);
+    $email = trim($_POST['email'] ?? '');
     $fotoName = $kasir['foto'] ?? null;
+    $errors = [];
 
-    // Handle upload foto jika ada
+    // Validasi username tidak boleh kosong
+    if (!$username) {
+        $errors[] = 'Username wajib diisi.';
+    }
+
+    // Cek duplikat username selain diri sendiri
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE username = ? AND id != ?");
+    $stmt->bind_param("si", $username, $id);
+    $stmt->execute();
+    $stmt->bind_result($countUsername);
+    $stmt->fetch();
+    $stmt->close();
+
+    if ($countUsername > 0) {
+        $errors[] = "Username sudah digunakan oleh kasir lain.";
+    }
+
+    // Cek duplikat email selain diri sendiri (kalau email diisi)
+    if ($email !== '') {
+        $stmt = $conn->prepare("SELECT COUNT(*) FROM users WHERE email = ? AND id != ?");
+        $stmt->bind_param("si", $email, $id);
+        $stmt->execute();
+        $stmt->bind_result($countEmail);
+        $stmt->fetch();
+        $stmt->close();
+
+        if ($countEmail > 0) {
+            $errors[] = "Email sudah digunakan oleh kasir lain.";
+        }
+    }
+
+    // Handle upload foto jika ada dan valid
     if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
         $tmpName = $_FILES['foto']['tmp_name'];
         $originalName = basename($_FILES['foto']['name']);
         $extension = strtolower(pathinfo($originalName, PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'gif'];
 
-        if (in_array($extension, $allowed)) {
+        if (!in_array($extension, $allowed)) {
+            $errors[] = "Format file foto tidak didukung.";
+        } else {
             $newName = uniqid('foto_') . '.' . $extension;
             $uploadPath = __DIR__ . '/../../assets/img/poto_profile/' . $newName;
             if (move_uploaded_file($tmpName, $uploadPath)) {
                 $fotoName = $newName;
+            } else {
+                $errors[] = "Gagal mengunggah foto.";
             }
         }
     }
 
-    $result = updateKasirFotoEmailUsername($id, $username, $email, $fotoName);
-    if ($result) {
-        header('Location: ../../superadmin/kasir.php?update=success');
-        exit;
+    if (empty($errors)) {
+        $result = updateKasirFotoEmailUsername($id, $username, $email, $fotoName);
+        if ($result) {
+            header('Location: ../../superadmin/kasir.php?update=success');
+            exit;
+        } else {
+            $error = "Gagal memperbarui data kasir.";
+        }
     } else {
-        $error = "Gagal memperbarui data kasir.";
+        $error = implode('<br>', $errors);
     }
 }
 ?>
