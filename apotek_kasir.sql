@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Waktu pembuatan: 10 Agu 2025 pada 10.58
+-- Waktu pembuatan: 13 Agu 2025 pada 18.41
 -- Versi server: 10.4.32-MariaDB
 -- Versi PHP: 8.2.12
 
@@ -48,7 +48,14 @@ INSERT INTO `detail_transaksi` (`id`, `id_transaksi`, `id_produk`, `jumlah`, `ha
 (7, 10, 7, 1, 13),
 (8, 11, 8, 1, 150000),
 (11, 14, 7, 1, 13),
-(12, 15, 8, 1, 150000);
+(12, 15, 8, 1, 150000),
+(14, 17, 8, 8, 150000),
+(15, 18, 7, 1, 13),
+(16, 18, 8, 1, 150000),
+(17, 19, 7, 1, 13),
+(18, 19, 8, 1, 150000),
+(19, 20, 12, 1, 100000),
+(20, 21, 12, 1, 100000);
 
 -- --------------------------------------------------------
 
@@ -72,9 +79,8 @@ CREATE TABLE `kategori` (
 
 INSERT INTO `kategori` (`id`, `gambar`, `nama_kategori`, `keterangan`, `jumlah_produk`, `created_by`, `updated_by`) VALUES
 (4, 'obat_keras_h7diak.png', 'Obat keras', 'obat yang hanya boleh dibeli menggunakan resep dokter. Tempat penjualan di Apotek. Pada obat bebas terbatas, selain terdapat tanda lingkaran biru, diberi pula tanda peringatan untuk aturan pakai obat sehingga obat ini aman digunakan untuk pengobatan sendiri.', 2, NULL, 3),
-(5, 'obat+bebas.png', 'obat bebas', 'obat yang dijual bebas di pasaran dan dapat dibeli tanpa resep dokter. Tempat penjualan di Apotek dan Toko Obat Berijin. Logo lingkaran berwarna biru dengan garis tepi berwarna hitam', 0, 3, NULL),
-(6, 'pers release dinkes - 1.jpg', 'Obat bebas terbatas', 'obat yang bisa diperoleh tanpa resep dokter namun tetap memerlukan kewaspadaan karena termasuk golongan obat keras yang memiliki batasan jumlah dan kadar zat aktifnya, ditandai dengan logo lingkaran biru bergaris tepi hitam pada kemasannya. Obat ini harus dibeli di apotek atau toko obat berizin dan disertai dengan tanda peringatan khusus yang berisi petunjuk cara penggunaan yang harus diikuti dengan benar.', 0, 3, NULL),
-(7, 'JAMU_FIX_c3l0j5.png', 'Obat jamu', 'obat tradisional khas Indonesia yang terbuat dari bahan-bahan alami seperti rempah-rempah, akar, dan daun, yang telah digunakan secara turun-temurun untuk menjaga kesehatan dan mengatasi berbagai penyakit. Jamu adalah bentuk obat tradisional yang paling sederhana, di mana pembuktian khasiat dan keamanannya didasarkan pada bukti empiris dan pengalaman masyarakat dari generasi ke generasi.', 0, 3, NULL);
+(7, 'JAMU_FIX_c3l0j5.png', 'Obat jamu', 'obat tradisional khas Indonesia yang terbuat dari bahan-bahan alami seperti rempah-rempah, akar, dan daun, yang telah digunakan secara turun-temurun untuk menjaga kesehatan dan mengatasi berbagai penyakit. Jamu adalah bentuk obat tradisional yang paling sederhana, di mana pembuktian khasiat dan keamanannya didasarkan pada bukti empiris dan pengalaman masyarakat dari generasi ke generasi.', 1, 3, NULL),
+(9, 'pers release dinkes - 1.jpg', 'obat bebas', 'biru', 0, 3, NULL);
 
 -- --------------------------------------------------------
 
@@ -138,8 +144,8 @@ CREATE TABLE `member` (
 --
 
 INSERT INTO `member` (`id`, `nama`, `no_hp`, `poin`, `status`) VALUES
-(2, 'ibnu', '089765891324', 137, 'aktif'),
-(10, 'yuki', '085697011994', 1200013, 'aktif');
+(2, 'ibnu', '089765891324', 100, 'aktif'),
+(10, 'yuki', '085697011994', 150, 'aktif');
 
 -- --------------------------------------------------------
 
@@ -183,8 +189,10 @@ CREATE TABLE `produk` (
 --
 
 INSERT INTO `produk` (`id`, `nama_produk`, `id_kategori`, `stok`, `harga_beli`, `harga_jual`, `expired_date`, `gambar`, `barcode`, `izin_edar`, `deskripsi`, `created_by`, `updated_by`) VALUES
-(7, 'teblet', 4, 7, 12, 13, '2025-08-13', '689738926b72a_lambang-dan-logo-removebg-preview.png', '0000000000007', '344', 'ff', NULL, NULL),
-(8, 'doxycyclineE', 4, 79, 90000, 150000, '2025-08-13', '6897432e70358_images.jpeg', '0000000000008', 'GKL9605021001A1', 'Dalam mengobati jerawat, doxycycline membunuh bakteri yang menginfeksi pori-pori kulit. Selain itu, obat ini juga mampu mengurangi produksi minyak berlebih yang memicu timbulnya jerawat.', 3, 3);
+(7, 'teblet', 4, 5, 12, 13, '2025-08-13', '689738926b72a_lambang-dan-logo-removebg-preview.png', '0000000000007', '344', 'ff', NULL, NULL),
+(8, 'doxycyclineE', 4, 69, 90000, 150000, '2025-08-13', '6897432e70358_images.jpeg', '0000000000008', 'GKL9605021001A1', 'Dalam mengobati jerawat, doxycycline membunuh bakteri yang menginfeksi pori-pori kulit. Selain itu, obat ini juga mampu mengurangi produksi minyak berlebih yang memicu timbulnya jerawat.', 3, 3),
+(11, 'jj', 9, 8, 90, 800, '2025-08-01', '689a92bbbca81_@jaeminry.jpeg', '8997031739578', '090', 'kh', 3, 3),
+(12, 'sirup', 7, 88, 90000, 100000, '2025-08-21', '689ae18b01afb_download (1).jpeg', '0000000000012', 'GKL9605021001A2', 'keren', 3, 3);
 
 -- --------------------------------------------------------
 
@@ -232,7 +240,12 @@ INSERT INTO `transaksi` (`id`, `id_kasir`, `id_member`, `total`, `tanggal`, `met
 (10, 8, NULL, 13, '2025-08-10 12:15:29', 'cash', 0, 5000, 0),
 (11, 8, 10, 150000, '2025-08-10 12:15:58', 'qris', 0, 0, 0),
 (14, 8, 2, 0, '2025-08-10 13:30:26', 'cash', 150, 0, 1),
-(15, 8, 2, 150000, '2025-08-10 13:34:19', 'cash', 0, 150000, 0);
+(15, 8, 2, 150000, '2025-08-10 13:34:19', 'cash', 0, 150000, 0),
+(17, 8, 10, 0, '2025-08-11 08:30:00', 'qris', 1200000, 0, 1),
+(18, 4, 10, 150000, '2025-08-12 13:18:04', 'cash', 13, 160000, 1),
+(19, 8, 10, 150013, '2025-08-12 13:32:16', 'cash', 0, 150013, 0),
+(20, 8, 2, 99863, '2025-08-12 13:47:50', 'cash', 137, 100000, 1),
+(21, 8, 2, 100000, '2025-08-12 13:48:21', 'cash', 0, 100000, 0);
 
 -- --------------------------------------------------------
 
@@ -249,17 +262,18 @@ CREATE TABLE `users` (
   `email` varchar(255) DEFAULT NULL,
   `reset_token` varchar(100) DEFAULT NULL,
   `reset_expiry` datetime DEFAULT NULL,
-  `foto` varchar(255) DEFAULT NULL
+  `foto` varchar(255) DEFAULT NULL,
+  `is_logged_in` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data untuk tabel `users`
 --
 
-INSERT INTO `users` (`id`, `nama`, `username`, `password`, `role`, `email`, `reset_token`, `reset_expiry`, `foto`) VALUES
-(3, 'Super Admin', 'admin', '$2y$10$zf6cvpM69q.0CFwafbkO8ufSKzifuAyTz6pGEt3HVcXsGBDizJdwa', 'superadmin', 'ayu.syafira93@smk.belajar.id', NULL, NULL, 'foto_6897536c89b68.jpg'),
-(4, 'Kasir Satu', 'kasir1', '$2y$10$YdPSmY7j10vt4ZrliyuOze7r13QMEA3cs0QN9CEA/2.ROnnOkhdF.', 'kasir', 'ayushafira2107@gmail.com', NULL, NULL, 'foto_689753849f68c.jpeg'),
-(8, 'Yoshi', 'yoshi ganteng', '$2y$10$i.KEFspF7pllQ7EN4vxUA.9hkZKzIA3NmioevExyJg5nhVIKqzXka', 'kasir', 'yoshi@gmail.com', NULL, NULL, 'foto_68975302a5576.jpeg');
+INSERT INTO `users` (`id`, `nama`, `username`, `password`, `role`, `email`, `reset_token`, `reset_expiry`, `foto`, `is_logged_in`) VALUES
+(3, 'Super Admin', 'admin', '$2y$10$IhuwbXs0EUKUhRbAkEQbgukP60dgFhH2rPyMSvJ8uiwwuPpHLyiSi', 'superadmin', 'ayu.syafira93@smk.belajar.id', NULL, NULL, 'foto_6897536c89b68.jpg', 0),
+(4, 'Kasir Satu', 'kasir1', '$2y$10$oeV8kC7VWSvLCZhboXSRwuoiWaRnPFNoU/gqc1Nup0TKgg4r.PiJu', 'kasir', 'ayushafira2107@gmail.com', NULL, NULL, 'foto_689753849f68c.jpeg', 0),
+(8, 'Yoshi', 'yoshi ganteng', '$2y$10$i.KEFspF7pllQ7EN4vxUA.9hkZKzIA3NmioevExyJg5nhVIKqzXka', 'kasir', 'yoshi@gmail.com', NULL, NULL, 'foto_68975302a5576.jpeg', 0);
 
 -- --------------------------------------------------------
 
@@ -352,13 +366,13 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT untuk tabel `detail_transaksi`
 --
 ALTER TABLE `detail_transaksi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT untuk tabel `kategori`
 --
 ALTER TABLE `kategori`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT untuk tabel `keranjang`
@@ -376,7 +390,7 @@ ALTER TABLE `log_kegiatan`
 -- AUTO_INCREMENT untuk tabel `member`
 --
 ALTER TABLE `member`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT untuk tabel `member_point_log`
@@ -388,7 +402,7 @@ ALTER TABLE `member_point_log`
 -- AUTO_INCREMENT untuk tabel `produk`
 --
 ALTER TABLE `produk`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT untuk tabel `reset_password`
@@ -400,13 +414,13 @@ ALTER TABLE `reset_password`
 -- AUTO_INCREMENT untuk tabel `transaksi`
 --
 ALTER TABLE `transaksi`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 
 --
 -- AUTO_INCREMENT untuk tabel `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- Ketidakleluasaan untuk tabel pelimpahan (Dumped Tables)
